@@ -1,10 +1,11 @@
-
+ #[derive(Debug)]
 enum Status{
     Office,
     Remote,
     Off,
     Course
 }
+ #[derive(Debug)]
 enum Day {
     Monday,
     Tuesday,
@@ -12,6 +13,27 @@ enum Day {
     Thursday,
     Friday
 }
+
+fn get_day(v: i64) -> Option<Day> {
+    match v {
+        0 => Some(Day::Monday),
+        1 => Some(Day::Tuesday),
+        2 => Some(Day::Wednesday),
+        3 => Some(Day::Thursday),
+        4 => Some(Day::Friday),
+        _ => None
+    }
+}
+fn get_status(v: i64) -> Option<Status> {
+    match v {
+        0 => Some(Status::Office),
+        1 => Some(Status::Remote),
+        2 => Some(Status::Off),
+        3 => Some(Status::Course),
+        _ => None
+    }
+}
+ #[derive(Debug)]
 struct Presence(Day, Status, Status);
 
 struct Poll{
@@ -36,6 +58,15 @@ fn main() {
         .unwrap()
         .map(|row| row.unwrap())
     {
-        println!("{:?}", row);  
+        //println!("{:?}", row);  
+        let day = get_day(row.read::<i64, _>("day")).unwrap();
+        let am = get_status(row.read::<i64, _>("am")).unwrap();
+        let pm = get_status(row.read::<i64, _>("pm")).unwrap();
+        let presence = Presence(day,am,pm);
+        println!("{:?}",presence);  
+        
+        // println!("{:?}", day);  
+
+        
     }
 }
