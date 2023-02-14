@@ -40,11 +40,12 @@ struct Presence(Day, Status, Status);
 
 struct Poll{
     year: u32,
-    week: u8
+    week: u8,
+    votes : Vec<Vote>
 }
+ #[derive(Debug)]
 struct Vote {
     name : String,
-    poll : Poll,
     presence : Vec<Presence>
 }
 
@@ -87,6 +88,18 @@ impl Dao {
                         .collect();
         return ret;
     }
+    pub fn get_all_votes(&self, poll_id:i64)->Vec<Vote>{
+        let mut ret: Vec<Vote> = Vec::new();
+        let names = self.get_distinct_names(poll_id);
+        for name in names {
+            let presence = self.get_presences(poll_id, &name);
+            ret.push(Vote {
+                name,
+                presence
+            });
+        }
+        ret
+    }
 
 }
 
@@ -94,10 +107,8 @@ fn main() {
     let connection = sqlite::open("../db.sqlite3").unwrap();
     let dao = Dao::new(connection);
 
-    let presences = dao.get_presences(1, "Thomas");
+    let votes = dao.get_all_votes(1,);
+    println!("{:?}", votes);
 
-    for pres in presences {
-        println!("{:?}", pres);
-    }
 
 }
