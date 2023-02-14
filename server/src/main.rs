@@ -1,3 +1,5 @@
+use sqlite::Connection;
+
  #[derive(Debug)]
 enum Status{
     Office,
@@ -45,28 +47,57 @@ struct Vote {
     poll : Poll,
     presence : Vec<Presence>
 }
+
+struct Dao {
+    connection : Connection
+}
+impl Dao {
+    fn new(connection : Connection) -> Dao {
+        Dao {
+            connection
+        }
+    }
+    
+    pub fn get_distinct_names(&self, id:i64) -> Vec<String> {
+        
+        let query = "SELECT DISTINCT(name) FROM Vote WHERE poll_id = ?";
+        let ret = self.connection.prepare(query)
+                        .unwrap()
+                        .into_iter()
+                        .bind((1,id))
+                        .unwrap()
+                        .map(|r| r.unwrap())
+                        .map(|r| String::from(r.read::<&str,_>("name")))
+                        .collect();
+        return ret;
+    }
+    pub fn get_presences(&self, poll_id:i64, name: &str) -> Vec<Presence>{
+        let query = "SELECT day,am,pm FROM Vote WHERE poll_id = ? AND name = ?";
+        let ret = self.connection.prepare(query)
+                        .unwrap()
+                        .into_iter()
+                        .bind((1,poll_id))
+                        .unwrap()
+                        .bind((2,name))
+                        .unwrap()
+                        .map(|r| r.unwrap())
+                        .map(|r| Presence(get_day(r.read::<i64,_>("day")).unwrap(), 
+                                               get_status(r.read::<i64,_>("am")).unwrap(), 
+                                               get_status(r.read::<i64,_>("pm")).unwrap()))
+                        .collect();
+        return ret;
+    }
+
+}
+
 fn main() {
     let connection = sqlite::open("../db.sqlite3").unwrap();
+    let dao = Dao::new(connection);
 
-    let query = "SELECT * FROM Vote WHERE poll_id = ?";
+    let presences = dao.get_presences(1, "Thomas");
 
-    for row in connection
-        .prepare(query)
-        .unwrap()
-        .into_iter()
-        .bind((1, 1))
-        .unwrap()
-        .map(|row| row.unwrap())
-    {
-        //println!("{:?}", row);  
-        let day = get_day(row.read::<i64, _>("day")).unwrap();
-        let am = get_status(row.read::<i64, _>("am")).unwrap();
-        let pm = get_status(row.read::<i64, _>("pm")).unwrap();
-        let presence = Presence(day,am,pm);
-        println!("{:?}",presence);  
-        
-        // println!("{:?}", day);  
-
-        
+    for pres in presences {
+        println!("{:?}", pres);
     }
+
 }
