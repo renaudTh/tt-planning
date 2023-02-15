@@ -38,9 +38,10 @@ fn get_status(v: i64) -> Option<Status> {
  #[derive(Debug)]
 struct Presence(Day, Status, Status);
 
+#[derive(Debug)]
 struct Poll{
-    year: u32,
-    week: u8,
+    year: i64,
+    week: i64,
     votes : Vec<Vote>
 }
  #[derive(Debug)]
@@ -100,6 +101,24 @@ impl Dao {
         }
         ret
     }
+    pub fn get_poll(&self, year:i64, week : i64) -> Poll{
+        let query = "SELECT * FROM Poll WHERE year = ? AND week = ?";
+        let ret = self.connection.prepare(query)
+                        .unwrap()
+                        .into_iter()
+                        .bind((1,year))
+                        .unwrap()
+                        .bind((2,week))
+                        .unwrap()
+                        .map(|r| r.unwrap())
+                        .map(|r| Poll{
+                            year : r.read::<i64,_>("year"),
+                            week : r.read::<i64,_>("week"),
+                            votes : self.get_all_votes(r.read::<i64,_>("id"))
+                        }).last().unwrap();
+                        
+        return ret
+    }
 
 }
 
@@ -107,8 +126,8 @@ fn main() {
     let connection = sqlite::open("../db.sqlite3").unwrap();
     let dao = Dao::new(connection);
 
-    let votes = dao.get_all_votes(1,);
-    println!("{:?}", votes);
+    let poll = dao.get_poll(2023, 7);
+    println!("{:?}", poll);
 
 
 }
