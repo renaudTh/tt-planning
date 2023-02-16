@@ -54,7 +54,7 @@ mod tests {
         println!("{:?}", res);
         assert!(res.contains(&String::from("Simon")));
         assert!(res.contains(&String::from("Thomas")));
-        assert_eq!(res.len(), 3);
+        assert_eq!(res.len(), 2);
     }
 
     #[test]

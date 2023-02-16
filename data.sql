@@ -16,16 +16,4 @@ CREATE TABLE IF NOT EXISTS "Vote" (
 	FOREIGN KEY("poll_id") REFERENCES "Poll"("id"),
 	PRIMARY KEY("poll_id","name","day")
 );
-INSERT INTO "Poll" ("id","year","week") VALUES (1,2023,7);
-INSERT INTO "Poll" ("id","year","week") VALUES (2,2023,8);
-INSERT INTO "Vote" ("poll_id","name","day","am","pm") VALUES (1,'Thomas',0,0,0);
-INSERT INTO "Vote" ("poll_id","name","day","am","pm") VALUES (1,'Simon',0,1,1);
-INSERT INTO "Vote" ("poll_id","name","day","am","pm") VALUES (1,'Thomas',1,0,0);
-INSERT INTO "Vote" ("poll_id","name","day","am","pm") VALUES (1,'Thomas',2,2,2);
-INSERT INTO "Vote" ("poll_id","name","day","am","pm") VALUES (1,'Thomas',3,2,2);
-INSERT INTO "Vote" ("poll_id","name","day","am","pm") VALUES (1,'Thomas',4,2,2);
-INSERT INTO "Vote" ("poll_id","name","day","am","pm") VALUES (1,'Simon',1,1,1);
-INSERT INTO "Vote" ("poll_id","name","day","am","pm") VALUES (1,'Simon',2,1,2);
-INSERT INTO "Vote" ("poll_id","name","day","am","pm") VALUES (1,'Simon',3,2,2);
-INSERT INTO "Vote" ("poll_id","name","day","am","pm") VALUES (1,'Simon',4,2,2);
 COMMIT;
