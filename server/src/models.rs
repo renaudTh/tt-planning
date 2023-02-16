@@ -46,5 +46,7 @@ pub struct Poll {
 #[derive(Debug)]
 pub struct Vote {
     pub name: String,
-    pub presence: Vec<Presence>,
+    pub day : Day,
+    pub am : Status,
+    pub pm : Status,
 }
