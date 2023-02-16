@@ -4,8 +4,8 @@ mod data_access;
 
 use models::*;
 use data_access::*;
+
 fn main() {
-    let dao = Dao::new("../db.sqlite3");
 
     let v = Vote{
         name: String::from("Clémence"),
@@ -17,10 +17,5 @@ fn main() {
             Presence(Day::Friday, Status::Remote, Status::Remote)
         ]
     };
-    
-    let insert = dao.add_vote(1, v);
-    match insert {
-        Ok(_) => println!("Vote added !"),
-        Err(err) => println!("{}", err)
-    }
+    println!("{:?}", v);
 }
