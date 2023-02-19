@@ -17,3 +17,27 @@ CREATE TABLE IF NOT EXISTS "Vote" (
 	PRIMARY KEY("poll_id","name","day")
 );
 COMMIT;
+
+
+/*  
+Poll(poll_id, year, week)
+Vote(poll_id, person, day, am, pm) 
+
+Vote {
+	poll_id : 1
+	person : "Thomas",
+	presences : [
+		{
+			day: "Monday",
+			am: "Remote",
+			pm: "Office"
+		}
+		{
+			day:"Tuesday",
+			am: "Office",
+			pm: "Office"
+		}
+	]
+}
+
+*/

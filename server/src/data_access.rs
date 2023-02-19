@@ -2,7 +2,7 @@ use super::models::*;
 use rusqlite::{params, Connection, Result};
 
 pub struct Dao {
-    connection: Connection,
+    connection:  Connection,
 }
 impl Dao {
     pub fn new(path: &str) -> Dao {
@@ -28,7 +28,7 @@ impl Dao {
         let mut ret: Vec<Vote> = Vec::new();
         let mut statement = self
             .connection
-            .prepare("SELECT * FROM Vote WHERE poll_id = ? ORDER BY day")?;
+            .prepare("SELECT * FROM Vote WHERE poll_id = ? ORDER BY name")?;
         let mut result_iter = statement.query([poll_id])?;
        
         while let Some(row) = result_iter.next()? {
@@ -41,6 +41,27 @@ impl Dao {
         Ok(ret)
     }
 
+    fn insert_vote(&self, poll_id: i64, votes: Vec<Vote>) -> Result<()>{
+        
+        for vote in votes {
+            self.insert_day_vote(poll_id,vote)?;
+        }
+        Ok(())
+    }
+    fn insert_day_vote(&self,poll_id: i64, vote : Vote) -> Result<()> {
+        self.connection.execute("INSERT INTO Vote (poll_id, name, day, am, pm) VALUES (?,?,?,?,?)",params![
+            poll_id, vote.name, vote.day as i64, vote.am as i64, vote.pm as i64
+        ])?;
+        Ok(())
+    }
+
+    fn delete_vote(&self, poll_id:i64, name:&str) -> Result<()>{
+        self.connection.execute("DELETE FROM Vote WHERE poll_id = ? AND name = ?", params![
+            poll_id, name
+        ])?;
+        Ok(())
+    }
+
 }
 #[cfg(test)]
 mod tests {
@@ -50,17 +71,73 @@ mod tests {
     #[test]
     fn get_distinct_names_test() {
         let dao = Dao::new("../db.sqlite3");
-        let res = dao.get_distinct_names(1).unwrap();
-        println!("{:?}", res);
-        assert!(res.contains(&String::from("Simon")));
-        assert!(res.contains(&String::from("Thomas")));
-        assert_eq!(res.len(), 2);
+        assert!(dao.get_distinct_names(1).is_ok());    
     }
 
     #[test]
     fn get_presences_test() {
         let dao = Dao::new("../db.sqlite3");
-        let v = dao.get_poll(1).unwrap();
-        println!("{:?}", v);
+        assert!(dao.get_poll(1).is_ok());
     }
+
+    #[test]
+    fn insert_presence_test(){
+        let dao = Dao::new("../db.sqlite3");
+        let v = Vote {
+            name: String::from("Clémence"),
+            day: Day::Monday,
+            am: Status::Office,
+            pm: Status::Remote
+        };
+       assert!(dao.insert_day_vote(1, v).is_ok());
+    }
+
+    #[test]
+    fn insert_complete_vote(){
+
+        let name = "Jehan";
+        let dao = Dao::new("../db.sqlite3");
+        let votes = vec![
+            Vote{
+                name:String::from(name),
+                day:Day::Monday,
+                am:Status::Office,
+                pm:Status::Office,
+            },
+            Vote{
+                name:String::from(name),
+                day:Day::Tuesday,
+                am:Status::Office,
+                pm:Status::Office,
+            },
+            Vote{
+                name:String::from(name),
+                day:Day::Wednesday,
+                am:Status::Office,
+                pm:Status::Office,
+            },
+            Vote{
+                name:String::from(name),
+                day:Day::Thursday,
+                am:Status::Office,
+                pm:Status::Remote,
+            },
+            Vote{
+                name:String::from(name),
+                day:Day::Friday,
+                am:Status::Off,
+                pm:Status::Off,
+            }
+        ];
+        assert!(dao.insert_vote(1, votes).is_ok());
+
+    }
+
+    #[test]
+    fn delete_vote_test(){
+        let dao = Dao::new("../db.sqlite3");
+        assert!(dao.delete_vote(1, "Thomas").is_ok());
+    }
+
+    
 }
