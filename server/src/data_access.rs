@@ -24,7 +24,7 @@ impl Dao {
         }
         Ok(ret)
     }
-    fn get_poll(&self, poll_id: i64) -> Result<Vec<Vote>> {
+    pub fn get_poll(&self, poll_id: i64) -> Result<Vec<Vote>> {
         let mut ret: Vec<Vote> = Vec::new();
         let mut statement = self
             .connection
