@@ -1,12 +1,15 @@
+use rocket::serde::{Serialize,Deserialize};
 
-#[derive(Debug)]
+#[derive(Debug,Serialize,Deserialize)]
+#[serde(crate = "rocket::serde")]
 pub enum Status {
     Office,
     Remote,
     Off,
     Course,
 }
-#[derive(Debug)]
+#[derive(Debug,Serialize,Deserialize)]
+#[serde(crate = "rocket::serde")]
 pub enum Day {
     Monday,
     Tuesday,
@@ -37,13 +40,17 @@ pub fn get_status(v: i64) -> Option<Status> {
 #[derive(Debug)]
 pub struct Presence(pub Day, pub Status, pub Status);
 
-#[derive(Debug)]
+#[derive(Debug,Serialize,Deserialize)]
+#[serde(crate = "rocket::serde")]
 pub struct Poll {
     pub year: i64,
     pub week: i64,
     pub votes: Vec<Vote>,
 }
-#[derive(Debug)]
+
+
+#[derive(Debug,Serialize,Deserialize)]
+#[serde(crate = "rocket::serde")]
 pub struct Vote {
     pub name: String,
     pub day : Day,
